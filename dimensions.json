@@ -1,0 +1,9 @@
+{
+  "description": "Fake MBTI dimension bars shown on result screen. Update here, then copy the array into const DIMENSIONS in index.html. Gradients use CSS linear-gradient syntax.",
+  "dimensions": [
+    { "label": "変態傾向 (H)", "gradient": "linear-gradient(90deg,#bf00ff,#ff2d78)" },
+    { "label": "腦洞深度 (N)", "gradient": "linear-gradient(90deg,#bf00ff,#00f0ff)" },
+    { "label": "中二指數 (C)", "gradient": "linear-gradient(90deg,#ff2d78,#ffe600)" },
+    { "label": "羞恥心殘留 (S)", "gradient": "linear-gradient(90deg,#00f0ff,#ff2d78)" }
+  ]
+}

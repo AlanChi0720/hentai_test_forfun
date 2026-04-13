@@ -1,2 +1,6 @@
 # Claude Code local settings
 .claude/
+
+# Test artifacts
+screenshots/
+test_app.py

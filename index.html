@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LNG 変態型人格測試量表</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0a0010;
@@ -19,6 +19,7 @@
       --card-bg: rgba(40, 0, 60, 0.7);
       --font-jp: 'Noto Serif JP', 'Yu Gothic', 'Meiryo', serif;
       --font-ui: 'Segoe UI', 'Helvetica Neue', sans-serif;
+      --font-display: 'Orbitron', monospace;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,6 +30,37 @@
       color: var(--text);
       font-family: var(--font-ui);
       overflow-x: hidden;
+    }
+
+    /* CRT scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.06) 3px,
+        rgba(0,0,0,0.06) 4px
+      );
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    /* subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(191,0,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(191,0,255,0.04) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
     }
 
     canvas#particles {
@@ -81,18 +113,42 @@
       animation: glitch 5s infinite;
     }
 
+    .intro-boot {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+      letter-spacing: 0.18em;
+      opacity: 0;
+      animation: boot-fade 0.6s ease forwards 0.2s;
+    }
+
+    @keyframes boot-fade {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 0.75; transform: translateX(0); }
+    }
+
+    .intro-deco-line {
+      width: 100%;
+      max-width: 440px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-purple) 25%, var(--neon-pink) 50%, var(--neon-purple) 75%, transparent);
+      box-shadow: 0 0 6px rgba(191,0,255,0.5);
+    }
+
     .intro-subtitle {
-      font-family: var(--font-jp);
-      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+      font-family: var(--font-display);
+      font-size: clamp(0.7rem, 2vw, 0.9rem);
       color: var(--neon-purple);
       text-shadow: 0 0 10px var(--neon-purple);
-      letter-spacing: 0.15em;
+      letter-spacing: 0.2em;
     }
 
     .intro-version {
-      font-size: 0.75rem;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
       color: var(--text-dim);
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       padding: 4px 14px;
       border: 1px solid rgba(191,0,255,0.3);
       border-radius: 50px;
@@ -120,9 +176,10 @@
     }
 
     .intro-footer {
-      font-size: 0.72rem;
+      font-family: var(--font-display);
+      font-size: 0.6rem;
       color: var(--text-dim);
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       margin-top: 8px;
     }
 
@@ -157,9 +214,10 @@
     }
 
     .question-counter {
-      font-size: 0.8rem;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
       color: var(--text-dim);
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-align: right;
     }
 
@@ -259,9 +317,10 @@
     }
 
     .result-header {
-      font-size: 0.85rem;
+      font-family: var(--font-display);
+      font-size: 0.7rem;
       color: var(--text-dim);
-      letter-spacing: 0.2em;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
     }
 
@@ -381,12 +440,12 @@
     }
 
     .final-code {
-      font-family: 'Courier New', monospace;
-      font-size: 1.6rem;
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 900;
       color: var(--neon-cyan);
       text-shadow: 0 0 16px var(--neon-cyan);
-      letter-spacing: 0.22em;
+      letter-spacing: 0.18em;
       animation: blink-glow 1.6s ease-in-out infinite alternate;
     }
 
@@ -442,24 +501,51 @@
 
     /* ===== ANIMATIONS ===== */
     @keyframes glitch {
-      0%, 90%, 100% {
+      0%, 86%, 100% {
         transform: none;
+        text-shadow: 0 0 20px var(--neon-pink), 0 0 60px rgba(255,45,120,0.5);
+      }
+      87% {
+        transform: skewX(-5deg) translateX(6px);
+        text-shadow: 6px 0 var(--neon-cyan), -6px 0 var(--neon-purple), 0 0 18px var(--neon-pink);
+      }
+      89% {
+        transform: skewX(4deg) translateX(-5px);
+        text-shadow: -6px 2px var(--neon-purple), 6px -2px var(--neon-cyan), 0 0 18px var(--neon-pink);
       }
       91% {
-        transform: skewX(-3deg) translateX(3px);
-        text-shadow: 3px 0 var(--neon-cyan), -3px 0 var(--neon-purple), 0 0 20px var(--neon-pink);
+        transform: none;
+        text-shadow: 0 0 4px #fff, 0 0 20px var(--neon-pink), 0 0 60px rgba(255,45,120,0.5);
       }
       93% {
-        transform: skewX(2deg) translateX(-2px);
-        text-shadow: -3px 0 var(--neon-cyan), 3px 0 var(--neon-purple), 0 0 20px var(--neon-pink);
+        transform: translateX(4px) scaleX(1.01);
+        text-shadow: -4px 0 var(--neon-cyan), 4px 0 var(--neon-purple);
       }
       95% {
-        transform: none;
-        text-shadow: -2px 0 var(--neon-cyan), 2px 0 var(--neon-pink), 0 0 20px var(--neon-pink);
+        transform: skewX(-2deg);
+        text-shadow: 0 0 20px var(--neon-pink), 0 0 60px rgba(255,45,120,0.5);
       }
-      97% {
-        transform: translateX(1px);
-      }
+      97% { transform: none; }
+    }
+
+    @keyframes glitch-storm {
+      0%   { transform: none; }
+      6%   { transform: skewX(-10deg) translateX(12px); text-shadow: 10px 0 var(--neon-cyan), -10px 0 var(--neon-purple), 0 0 30px var(--neon-pink); }
+      10%  { transform: skewX(6deg) translateX(-10px); text-shadow: -10px 2px var(--neon-purple), 10px -2px var(--neon-cyan); }
+      14%  { transform: none; text-shadow: 0 0 60px #fff, 0 0 30px var(--neon-pink); }
+      18%  { transform: skewX(-3deg) translateX(8px); text-shadow: 8px 0 var(--neon-cyan), -5px 0 var(--neon-purple); }
+      22%  { transform: none; }
+      28%  { transform: translateX(5px); text-shadow: -5px 0 var(--neon-purple), 0 0 30px var(--neon-pink); }
+      32%  { transform: translateX(-5px); }
+      38%  { transform: skewX(4deg); text-shadow: 4px 0 var(--neon-cyan), 0 0 20px var(--neon-pink); }
+      44%  { transform: none; }
+      50%  { transform: scaleX(1.02); text-shadow: 0 0 40px var(--neon-pink), 0 0 90px rgba(191,0,255,0.9); }
+      60%  { transform: none; text-shadow: 0 0 30px var(--neon-pink), 0 0 80px rgba(191,0,255,0.6); }
+      100% { transform: none; }
+    }
+
+    .result-type.glitch-storm {
+      animation: glitch-storm 1.1s cubic-bezier(0.23,1,0.32,1) forwards !important;
     }
 
     @keyframes float {
@@ -498,7 +584,10 @@
 
 <!-- ===== INTRO ===== -->
 <div id="screen-intro" class="screen active">
+  <div class="intro-boot">&gt; SYSTEM INITIALIZING... [OK]</div>
+  <div class="intro-deco-line"></div>
   <div class="intro-logo">LNG 変態型人格測試量表</div>
+  <div class="intro-deco-line"></div>
   <div class="intro-subtitle">LNG Hentai Personality Scale</div>
   <div class="intro-version">v1.0 &nbsp;—&nbsp; 科學認定・絕對「不」準確</div>
   <div class="intro-description">
@@ -532,7 +621,7 @@
   <div class="result-type-label">你的人格類型是</div>
   <div class="result-type">変態です</div>
   <div class="divider"></div>
-  <img src="./hentaidesu.png" id="result-img" alt="hentaidesu">
+  <img src="./pic_data/hentaidesu.png" id="result-img" alt="hentaidesu">
   <div class="mbti-bars-section" id="mbti-bars"></div>
   <div class="result-comments-section" id="result-comments"></div>
   <div class="result-final">
@@ -548,7 +637,7 @@
 
 <script>
 // ===== DATA =====
-// Question data (from question.json — update here when adding new questions)
+// Question data (from questions.json — update here when adding new questions)
 const QUESTIONS = [
   {
     "id": 1,
@@ -579,9 +668,70 @@ const QUESTIONS = [
     "category": "性格底色 (奇葩直覺類)",
     "question": "如果世界末日只剩下最後一分鐘，而你面前有一顆可以實現任何願望的按鈕，但代價是全世界的人都會忘記你存在過，你會？",
     "options": ["按下它，救活所有人","按下它，讓自己一個人活下去","不按它，跟大家一起毀滅","把按鈕拆了看看裡面有什麼"]
+  },
+  {
+    "id": 6,
+    "category": "記憶偽造 (時間異常類)",
+    "question": "你突然發現，你有一段童年記憶根本不可能存在——你清楚記得六歲時看了一部沒有結局的卡通，但長大後查明那部卡通在你出生前就已停播。此刻你最想做什麼？",
+    "options": ["馬上打電話問媽媽確認真相","重新回想那段記憶，越想越詳細","接受它是假記憶，繼續生活","把記憶寫下來，計畫去找那部卡通的製作人"]
+  },
+  {
+    "id": 7,
+    "category": "日常荒誕 (存在危機類)",
+    "question": "你在超商排隊，發現收銀台後面的店員臉上沒有五官——完全光滑。你環顧四周，其他顧客都面無表情，似乎沒人注意到。你選擇？",
+    "options": ["假裝一切正常，默默結帳離開","大聲詢問旁邊的人是否看到同樣的事","掏出手機想錄影，但發現相機只拍到空白","掏出錢包確認自己的身分證照片"]
+  },
+  {
+    "id": 8,
+    "category": "人際動態 (平行宇宙類)",
+    "question": "你發現你的最好朋友在所有其他人的記憶中根本不存在。你帶著他出現在聚會，眾人卻視而不見；你展示合照，照片裡卻只有你一人。你怎麼做？",
+    "options": ["質問朋友他是否是幽靈","開始懷疑自己才是虛構的","默默刪除所有和他的合照","一笑而過，繼續約他打球"]
+  },
+  {
+    "id": 9,
+    "category": "感官扭曲 (恐怖直播類)",
+    "question": "你半夜打開電視，發現有個頻道正在直播你目前的房間——鏡頭角度完全一致。你舉起手，螢幕裡的人也舉起手，但比你慢了整整三秒。這三秒讓你？",
+    "options": ["立刻關掉電視，假裝沒看到","試圖用奇怪的動作測試他的反應","打電話給朋友要他來陪你看","等那個人的下一步動作到天亮"]
+  },
+  {
+    "id": 10,
+    "category": "邏輯崩塌 (假設推演類)",
+    "question": "有人告訴你，你其實已經死了三年，目前只是一個高度擬真的記憶殘影在繼續運行，並提供了完整的死亡證明和報告。你的第一反應是？",
+    "options": ["要求看那份死亡證明","問他我現在算活的還是死的","馬上吃東西確認自己有感覺","點頭表示：「我就說嘛，感覺哪裡怪怪的。」"]
+  },
+  {
+    "id": 11,
+    "category": "行為測試 (反應速度類)",
+    "question": "你突然發現，你今天做的每一個決定都會以相反的方式影響一個陌生人——你多吃一口，他就少吃一口。你會怎麼改變你的行為？",
+    "options": ["開始刻意多吃多喝，幫助他維持體力","完全不改變，因為這聽起來太瘋了","試圖聯絡那個陌生人共同制定計畫","立刻開始絕食，確保他不會挨餓"]
+  },
+  {
+    "id": 12,
+    "category": "社會實驗 (窺探人心類)",
+    "question": "你路過一家咖啡廳，窗邊有人正在讀一本書，書名是《如何徹底消失》。你們目光交錯，他立刻把書藏到桌下裝作沒事。你走進去後？",
+    "options": ["假裝沒看到，點咖啡坐到對面","直接走過去問他那本書好不好看","在他旁邊坐下但一句話都不說","掏出手機假裝打電話，其實在錄音"]
+  },
+  {
+    "id": 13,
+    "category": "宇宙哲學 (腦洞極限類)",
+    "question": "科學家宣稱，宇宙中最深層的孤獨是短暫感知到自己是唯一有意識的存在。你最後一次感受到這種感覺是什麼時候？",
+    "options": ["深夜刷社群媒體刷到凌晨三點時","在人潮擁擠的捷運站突然覺得沒人看見我","完全沒有，我每秒都覺得有人在看我","昨天早上對著浴室鏡子發呆的時候"]
+  },
+  {
+    "id": 14,
+    "category": "色彩感知 (偽科學測驗類)",
+    "question": "請憑直覺作答：如果你的「潛意識」是一種顏色，它絕對不會是哪種顏色？",
+    "options": ["米色（太普通，潛意識不屑）","透明（太空洞，放棄掙扎）","顏色在我的潛意識中並不存在","沒有顏色能代表它，它會把顏色吃掉"]
+  },
+  {
+    "id": 15,
+    "category": "終極測試 (後設認知類)",
+    "question": "你正在做這份測試，突然懷疑「這份測試本身是否也在測試你懷疑它的行為」。你對這個想法的反應是？",
+    "options": ["立刻停下來思考這個陷阱三分鐘","選最奇怪的答案，反其道而行","覺得這種想法本身已經是結果的一部分","把測試關掉，告訴朋友這個測試有問題"]
   }
 ];
 
+// Comment pool (source of truth: comments.json — edit there, then copy array here)
 const COMMENTS = [
   "根據 LNG 変態研究所最新報告，您的変態指數已超越全球 99.7% 的受測者。恭喜您，這是一項非凡的成就。",
   "您的潛意識對「正常」二字有強烈的過敏反應，建議每日早晨對鏡子說三次「私は変態です」以維持心理平衡。",
@@ -590,9 +740,25 @@ const COMMENTS = [
   "您的人格類型在已知宇宙中僅出現過 3 次，其餘兩次分別是一隻章魚和《新世紀福音戰士》的導演。",
   "LNG 腦波掃描顯示，您的「羞恥心」區域與「求生本能」區域已完全互換位置。これは進化です。",
   "本測試採用量子纏繞算法，無論您選擇什麼答案，結果都指向同一個結論：変態。宇宙如此，無從抗拒。",
-  "恭喜您成功激活了隱藏人格：HENTAIDESU 型。此類型人格最後一次被記錄是在 1987 年的某個深夜動漫錄影帶研究報告中。"
+  "恭喜您成功激活了隱藏人格：HENTAIDESU 型。此類型人格最後一次被記錄是在 1987 年的某個深夜動漫錄影帶研究報告中。",
+  "經 LNG 量子心理研究中心驗證，您的変態指數已在多個平行宇宙中被同步確認。其他維度的您也不例外。",
+  "本系統偵測到：您在作答時有 3.7 秒的猶豫。那 3.7 秒是系統真正分析您的時間。結果不受您的選擇影響。",
+  "根據変態係數公式 H = (腦洞² × 羞恥心⁻¹) × 時間常數，您的 H 值已溢位，程式被迫以「変態です」替代顯示。",
+  "您的人格報告已自動轉發至 LNG 変態研究資料庫，並將成為下一代 AI 変態模型的訓練資料。感謝您的貢獻。",
+  "系統警告：受測者的答案模式與 2019 年某深夜便利商店監控畫面中無臉人的行為軌跡高度吻合。請保持冷靜。",
+  "根據跨維度変態指數比較，您比宇宙熱寂後最後一隻存活生命體的変態程度高出 12%。這很了不起。",
+  "LNG 腦電圖顯示：您的大腦在「正常」這個詞出現時會自動觸發防禦性跳過機制。臨床上稱為「変態免疫」。",
+  "您的答案已成功破解本測試的所有隱藏層邏輯——但結果仍然是変態です。隱藏層不影響結論。",
+  "測試結果正在上傳至雲端… 上傳完成。已通知您媽媽。"
 ];
 
+// Result images — add new filenames here when dropping more images into pic_data/
+const RESULT_IMAGES = [
+  "./pic_data/hentaidesu.png",
+  "./pic_data/mabushi_hentai.png"
+];
+
+// MBTI dimensions (source of truth: dimensions.json — edit there, then copy array here)
 const DIMENSIONS = [
   { label: "変態傾向 (H)", gradient: "linear-gradient(90deg,#bf00ff,#ff2d78)" },
   { label: "腦洞深度 (N)", gradient: "linear-gradient(90deg,#bf00ff,#00f0ff)" },
@@ -726,6 +892,10 @@ function showResult() {
     barsSection.appendChild(row);
   });
 
+  // Random result image
+  const img = document.getElementById('result-img');
+  img.src = RESULT_IMAGES[Math.floor(Math.random() * RESULT_IMAGES.length)];
+
   // Pick 2 random comments
   const chosen = pickN(COMMENTS, 2);
   const commentsSection = document.getElementById('result-comments');
@@ -738,6 +908,13 @@ function showResult() {
   });
 
   transitionTo('screen-result');
+
+  // Glitch-storm on result type reveal
+  setTimeout(() => {
+    const rt = document.querySelector('.result-type');
+    rt.classList.add('glitch-storm');
+    setTimeout(() => rt.classList.remove('glitch-storm'), 1200);
+  }, 500);
 
   // Animate bars after transition
   setTimeout(() => {

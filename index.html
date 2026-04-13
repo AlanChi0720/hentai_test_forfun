@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LNG 変態型人格測試量表</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0010;
+      --bg2: #110020;
+      --neon-pink: #ff2d78;
+      --neon-purple: #bf00ff;
+      --neon-cyan: #00f0ff;
+      --neon-yellow: #ffe600;
+      --text: #f0e6ff;
+      --text-dim: #a080c0;
+      --card-bg: rgba(40, 0, 60, 0.7);
+      --font-jp: 'Noto Serif JP', 'Yu Gothic', 'Meiryo', serif;
+      --font-ui: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, #1a0030 0%, #0a0010 70%);
+      color: var(--text);
+      font-family: var(--font-ui);
+      overflow-x: hidden;
+    }
+
+    canvas#particles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== SCREENS ===== */
+    .screen {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s cubic-bezier(0.4,0,0.2,1), transform 0.4s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 56px;
+    }
+    .screen.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .screen.fade-out {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    /* ===== INTRO SCREEN ===== */
+    #screen-intro {
+      justify-content: center;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .intro-logo {
+      font-family: var(--font-jp);
+      font-size: clamp(1.6rem, 5.5vw, 2.8rem);
+      font-weight: 900;
+      color: var(--neon-pink);
+      text-shadow: 0 0 20px var(--neon-pink), 0 0 60px rgba(255,45,120,0.5);
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      animation: glitch 5s infinite;
+    }
+
+    .intro-subtitle {
+      font-family: var(--font-jp);
+      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+      color: var(--neon-purple);
+      text-shadow: 0 0 10px var(--neon-purple);
+      letter-spacing: 0.15em;
+    }
+
+    .intro-version {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      padding: 4px 14px;
+      border: 1px solid rgba(191,0,255,0.3);
+      border-radius: 50px;
+      display: inline-block;
+    }
+
+    .intro-description {
+      max-width: 420px;
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.9;
+      background: var(--card-bg);
+      border: 1px solid rgba(191,0,255,0.3);
+      border-radius: 16px;
+      padding: 20px 24px;
+      backdrop-filter: blur(6px);
+    }
+
+    .warning-text {
+      display: block;
+      margin-top: 10px;
+      color: var(--neon-yellow);
+      font-size: 0.85rem;
+      text-shadow: 0 0 8px var(--neon-yellow);
+    }
+
+    .intro-footer {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      margin-top: 8px;
+    }
+
+    /* ===== QUESTION SCREEN ===== */
+    #screen-question {
+      justify-content: flex-start;
+      gap: 0;
+    }
+
+    .question-header {
+      width: 100%;
+      max-width: 560px;
+      margin-bottom: 24px;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+      border-radius: 2px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 8px var(--neon-pink);
+      width: 0%;
+    }
+
+    .question-counter {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-align: right;
+    }
+
+    .question-category {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: var(--neon-purple);
+      border: 1px solid var(--neon-purple);
+      border-radius: 50px;
+      padding: 3px 12px;
+      margin-bottom: 18px;
+      text-shadow: 0 0 6px var(--neon-purple);
+      letter-spacing: 0.05em;
+    }
+
+    .question-text {
+      font-family: var(--font-jp);
+      font-size: clamp(0.95rem, 2.8vw, 1.15rem);
+      line-height: 1.85;
+      color: var(--text);
+      max-width: 560px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid rgba(191,0,255,0.25);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(6px);
+    }
+
+    .options-container {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background: var(--card-bg);
+      border: 1px solid rgba(191,0,255,0.35);
+      color: var(--text);
+      padding: 14px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      font-size: 0.95rem;
+      font-family: var(--font-jp);
+      line-height: 1.5;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+      backdrop-filter: blur(6px);
+      width: 100%;
+    }
+
+    .option-btn:hover {
+      border-color: var(--neon-pink);
+      background: rgba(255,45,120,0.1);
+      transform: translateX(6px);
+      box-shadow: 0 0 12px rgba(255,45,120,0.3), 0 0 30px rgba(191,0,255,0.15);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.selected {
+      border-color: var(--neon-pink);
+      background: rgba(255,45,120,0.18);
+      box-shadow: 0 0 16px rgba(255,45,120,0.4);
+      transform: translateX(4px);
+    }
+
+    .option-letter {
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #fff;
+      box-shadow: 0 0 8px rgba(191,0,255,0.5);
+    }
+
+    /* ===== RESULT SCREEN ===== */
+    #screen-result {
+      justify-content: flex-start;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .result-header {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .result-type-label {
+      font-family: var(--font-jp);
+      font-size: 1rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    .result-type {
+      font-family: var(--font-jp);
+      font-size: clamp(2.8rem, 10vw, 5.5rem);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 30px var(--neon-pink), 0 0 80px rgba(191,0,255,0.6), 0 0 120px rgba(255,45,120,0.3);
+      letter-spacing: 0.08em;
+      animation: glitch 3.5s infinite 0.8s;
+      line-height: 1.1;
+    }
+
+    #result-img {
+      width: clamp(160px, 38vw, 260px);
+      border-radius: 16px;
+      border: 2px solid var(--neon-pink);
+      box-shadow: 0 0 30px var(--neon-pink), 0 0 80px rgba(191,0,255,0.4);
+      animation: float 3.2s ease-in-out infinite;
+      display: block;
+    }
+
+    /* ===== MBTI BARS ===== */
+    .mbti-bars-section {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border: 1px solid rgba(191,0,255,0.3);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      backdrop-filter: blur(6px);
+    }
+
+    .mbti-bar-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 42px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bar-label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      text-align: right;
+    }
+
+    .bar-track {
+      height: 12px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      width: 0%;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    .bar-pct {
+      font-size: 0.8rem;
+      color: var(--neon-pink);
+      font-weight: 700;
+      text-align: left;
+    }
+
+    /* ===== COMMENTS ===== */
+    .result-comments-section {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .result-comment {
+      background: var(--card-bg);
+      border: 1px solid rgba(191,0,255,0.4);
+      border-left: 3px solid var(--neon-pink);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-family: var(--font-jp);
+      font-size: 0.9rem;
+      line-height: 1.8;
+      text-align: left;
+      backdrop-filter: blur(6px);
+    }
+
+    /* ===== FINAL CODE ===== */
+    .result-final {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .final-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    .final-code {
+      font-family: 'Courier New', monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 16px var(--neon-cyan);
+      letter-spacing: 0.22em;
+      animation: blink-glow 1.6s ease-in-out infinite alternate;
+    }
+
+    /* ===== CREDIT ===== */
+    .result-credit {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-align: center;
+      letter-spacing: 0.06em;
+      line-height: 1.8;
+      margin-top: 4px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary, .btn-secondary {
+      border: none;
+      cursor: pointer;
+      border-radius: 50px;
+      font-family: var(--font-jp);
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 14px 52px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255,45,120,0.6), 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.06) translateY(-2px);
+      box-shadow: 0 0 35px rgba(255,45,120,0.8), 0 8px 30px rgba(0,0,0,0.5);
+    }
+
+    .btn-primary:active, .btn-secondary:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--neon-pink);
+      border: 2px solid var(--neon-pink);
+      box-shadow: 0 0 12px rgba(255,45,120,0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,45,120,0.1);
+      box-shadow: 0 0 24px rgba(255,45,120,0.5);
+      transform: scale(1.04) translateY(-2px);
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes glitch {
+      0%, 90%, 100% {
+        transform: none;
+      }
+      91% {
+        transform: skewX(-3deg) translateX(3px);
+        text-shadow: 3px 0 var(--neon-cyan), -3px 0 var(--neon-purple), 0 0 20px var(--neon-pink);
+      }
+      93% {
+        transform: skewX(2deg) translateX(-2px);
+        text-shadow: -3px 0 var(--neon-cyan), 3px 0 var(--neon-purple), 0 0 20px var(--neon-pink);
+      }
+      95% {
+        transform: none;
+        text-shadow: -2px 0 var(--neon-cyan), 2px 0 var(--neon-pink), 0 0 20px var(--neon-pink);
+      }
+      97% {
+        transform: translateX(1px);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes blink-glow {
+      from { text-shadow: 0 0 8px var(--neon-cyan); }
+      to   { text-shadow: 0 0 30px var(--neon-cyan), 0 0 60px rgba(0,240,255,0.5); }
+    }
+
+    @keyframes pulse-in {
+      0%   { transform: scale(0.95); opacity: 0.6; }
+      60%  { transform: scale(1.04); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .option-btn.selected {
+      animation: pulse-in 0.3s ease forwards;
+    }
+
+    /* divider */
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
+      border-radius: 1px;
+      margin: 4px auto;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- ===== INTRO ===== -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-logo">LNG 変態型人格測試量表</div>
+  <div class="intro-subtitle">LNG Hentai Personality Scale</div>
+  <div class="intro-version">v1.0 &nbsp;—&nbsp; 科學認定・絕對「不」準確</div>
+  <div class="intro-description">
+    本測試採用獨家 LNG 変態係數演算法，<br>
+    透過 5 道精心設計的情境題，<br>
+    精準診斷您的人格類型。<br>
+    測試結果完全「沒有」的科學依據，<br>
+    且已通過國際変態心理學會認證。
+    <span class="warning-text">⚠ 測試結果可能令您大受震驚</span>
+  </div>
+  <button id="btn-start" class="btn-primary">開始測試</button>
+  <div class="intro-footer">Powered by 紐約怪人 Research Institute of Hentai Studies</div>
+</div>
+
+<!-- ===== QUESTION ===== -->
+<div id="screen-question" class="screen">
+  <div class="question-header">
+    <div class="progress-bar-wrap">
+      <div id="progress-bar" class="progress-bar-fill"></div>
+    </div>
+    <div id="question-counter" class="question-counter">第 1 題 / 共 5 題</div>
+  </div>
+  <div id="question-category" class="question-category"></div>
+  <div id="question-text" class="question-text"></div>
+  <div id="options-container" class="options-container"></div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div id="screen-result" class="screen">
+  <div class="result-header">— 診斷完成 —</div>
+  <div class="result-type-label">你的人格類型是</div>
+  <div class="result-type">変態です</div>
+  <div class="divider"></div>
+  <img src="./hentaidesu.png" id="result-img" alt="hentaidesu">
+  <div class="mbti-bars-section" id="mbti-bars"></div>
+  <div class="result-comments-section" id="result-comments"></div>
+  <div class="result-final">
+    <span class="final-label">最終診斷代碼：</span>
+    <span class="final-code">HENTAIDESU</span>
+  </div>
+  <button id="btn-retry" class="btn-secondary">再測一次</button>
+  <div class="result-credit">
+    本測試由 <strong>紐約怪人</strong> 製作 ｜ 致敬 LNG ｜ 版權所有・侵変必究<br>
+    紐約怪人 Hentai Research Institute &copy; 2025
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+// Question data (from question.json — update here when adding new questions)
+const QUESTIONS = [
+  {
+    "id": 1,
+    "category": "邏輯反轉 (細思極恐類)",
+    "question": "你在森林裡迷路了，這時前方出現一個小木屋。你推開門，發現裡面坐著一個背對著你的老人。你開口問路，他卻沒有回頭，只說了一句：『你終於來了，我已經等你很久了。』這時你注意到桌上有三樣東西，你直覺哪一樣最不協調？",
+    "options": ["一把沾滿泥土的雨傘","一個正在冒煙的空杯子","一本翻開但全白的書","一盤還在跳動的生肉"]
+  },
+  {
+    "id": 2,
+    "category": "壓力測試 (腦洞大開類)",
+    "question": "如果你醒來發現自己變成了一台「自動販賣機」，且你無法說話，只能透過掉落物品來表達情緒。當有人踢了你一腳時，你會掉出什麼？",
+    "options": ["過期的牛奶","一塊沉重的磚頭","一張中獎的彩券","一顆發光的燈泡"]
+  },
+  {
+    "id": 3,
+    "category": "價值觀 (生存遊戲類)",
+    "question": "一艘快要沉沒的船上只剩最後一個救生圈，你身邊有四個人，你必須決定把救生圈給誰：",
+    "options": ["掌握重要機密的科學家","懷孕五個月的孕婦","你唯一的親生弟弟","這艘船的船長"]
+  },
+  {
+    "id": 4,
+    "category": "潛意識投射 (恐怖童話類)",
+    "question": "你在深夜路過一片墓地，看到一個小女孩坐在墓碑上哭。你走過去問她為什麼哭，她抬起頭（臉部模糊），遞給你一個盒子。你覺得盒子裡裝著什麼？",
+    "options": ["一顆還在跳動的心臟","一堆斷掉的手指頭","一封寫滿咒罵的信","一隻死掉的黑色蝴蝶"]
+  },
+  {
+    "id": 5,
+    "category": "性格底色 (奇葩直覺類)",
+    "question": "如果世界末日只剩下最後一分鐘，而你面前有一顆可以實現任何願望的按鈕，但代價是全世界的人都會忘記你存在過，你會？",
+    "options": ["按下它，救活所有人","按下它，讓自己一個人活下去","不按它，跟大家一起毀滅","把按鈕拆了看看裡面有什麼"]
+  }
+];
+
+const COMMENTS = [
+  "根據 LNG 変態研究所最新報告，您的変態指數已超越全球 99.7% 的受測者。恭喜您，這是一項非凡的成就。",
+  "您的潛意識對「正常」二字有強烈的過敏反應，建議每日早晨對鏡子說三次「私は変態です」以維持心理平衡。",
+  "測試結果顯示：您的大腦有 87% 的神經元正在處理與常識背道而馳的信號。剩餘 13% 可能在睡覺。",
+  "専門家診断：あなたの変態レベルは測定限界を突破しました。本測試儀器已因您的結果而宣告損毀。",
+  "您的人格類型在已知宇宙中僅出現過 3 次，其餘兩次分別是一隻章魚和《新世紀福音戰士》的導演。",
+  "LNG 腦波掃描顯示，您的「羞恥心」區域與「求生本能」區域已完全互換位置。これは進化です。",
+  "本測試採用量子纏繞算法，無論您選擇什麼答案，結果都指向同一個結論：変態。宇宙如此，無從抗拒。",
+  "恭喜您成功激活了隱藏人格：HENTAIDESU 型。此類型人格最後一次被記錄是在 1987 年的某個深夜動漫錄影帶研究報告中。"
+];
+
+const DIMENSIONS = [
+  { label: "変態傾向 (H)", gradient: "linear-gradient(90deg,#bf00ff,#ff2d78)" },
+  { label: "腦洞深度 (N)", gradient: "linear-gradient(90deg,#bf00ff,#00f0ff)" },
+  { label: "中二指數 (C)", gradient: "linear-gradient(90deg,#ff2d78,#ffe600)" },
+  { label: "羞恥心殘留 (S)", gradient: "linear-gradient(90deg,#00f0ff,#ff2d78)" }
+];
+
+// ===== STATE =====
+const state = {
+  questions: [],
+  current: 0,
+  answers: []
+};
+
+// ===== UTILS =====
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickN(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+
+function randPct() {
+  return Math.floor(Math.random() * 44) + 55;
+}
+
+// ===== SCREEN TRANSITIONS =====
+function transitionTo(screenId) {
+  const screens = document.querySelectorAll('.screen');
+  const target = document.getElementById(screenId);
+
+  screens.forEach(s => {
+    if (s.classList.contains('active') && s !== target) {
+      s.classList.add('fade-out');
+      setTimeout(() => {
+        s.classList.remove('active', 'fade-out');
+        s.style.display = 'none';
+      }, 380);
+    }
+  });
+
+  setTimeout(() => {
+    target.style.display = 'flex';
+    void target.offsetHeight; // force reflow
+    target.classList.add('active');
+    window.scrollTo(0, 0);
+  }, 380);
+}
+
+// ===== INTRO =====
+function showIntro() {
+  transitionTo('screen-intro');
+}
+
+// ===== QUESTIONS =====
+function startTest() {
+  state.questions = shuffle(QUESTIONS).slice(0, 5);
+  state.current = 0;
+  state.answers = [];
+  showQuestion(0);
+}
+
+function showQuestion(index) {
+  const q = state.questions[index];
+  const total = state.questions.length;
+
+  document.getElementById('progress-bar').style.width = (index / total * 100) + '%';
+  document.getElementById('question-counter').textContent = `第 ${index + 1} 題 / 共 ${total} 題`;
+  document.getElementById('question-category').textContent = q.category;
+  document.getElementById('question-text').textContent = q.question;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span class="option-text">${opt}</span>`;
+    btn.onclick = () => selectOption(letters[i], btn);
+    container.appendChild(btn);
+  });
+
+  transitionTo('screen-question');
+}
+
+function selectOption(value, clickedBtn) {
+  // Disable all buttons to prevent double-click
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.disabled = true;
+  });
+  clickedBtn.classList.add('selected');
+  state.answers.push(value);
+
+  setTimeout(() => {
+    if (state.current < state.questions.length - 1) {
+      state.current++;
+      showQuestion(state.current);
+    } else {
+      showResult();
+    }
+  }, 450);
+}
+
+// ===== RESULT =====
+function showResult() {
+  // Progress bar to 100%
+  document.getElementById('progress-bar').style.width = '100%';
+
+  // Build MBTI bars
+  const barsSection = document.getElementById('mbti-bars');
+  barsSection.innerHTML = '';
+  const pcts = DIMENSIONS.map(() => randPct());
+
+  DIMENSIONS.forEach((dim, i) => {
+    const row = document.createElement('div');
+    row.className = 'mbti-bar-row';
+    row.innerHTML = `
+      <span class="bar-label">${dim.label}</span>
+      <div class="bar-track">
+        <div class="bar-fill" data-target="${pcts[i]}" style="background:${dim.gradient}" id="bar-${i}"></div>
+      </div>
+      <span class="bar-pct">${pcts[i]}%</span>
+    `;
+    barsSection.appendChild(row);
+  });
+
+  // Pick 2 random comments
+  const chosen = pickN(COMMENTS, 2);
+  const commentsSection = document.getElementById('result-comments');
+  commentsSection.innerHTML = '';
+  chosen.forEach(text => {
+    const div = document.createElement('div');
+    div.className = 'result-comment';
+    div.textContent = text;
+    commentsSection.appendChild(div);
+  });
+
+  transitionTo('screen-result');
+
+  // Animate bars after transition
+  setTimeout(() => {
+    DIMENSIONS.forEach((_, i) => {
+      setTimeout(() => {
+        const fill = document.getElementById(`bar-${i}`);
+        if (fill) fill.style.width = fill.dataset.target + '%';
+      }, i * 150);
+    });
+  }, 700);
+}
+
+// ===== RETRY =====
+function retry() {
+  state.questions = shuffle(QUESTIONS).slice(0, 5);
+  state.current = 0;
+  state.answers = [];
+  showIntro();
+}
+
+// ===== PARTICLES =====
+function initParticles() {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['#ff2d78', '#bf00ff', '#00f0ff', '#ff2d78', '#bf00ff'];
+  let particles = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function createParticle() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.8 + 0.4,
+      speed: Math.random() * 0.4 + 0.1,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      alpha: Math.random() * 0.4 + 0.05,
+      drift: (Math.random() - 0.5) * 0.3
+    };
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 65; i++) particles.push(createParticle());
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+      p.y -= p.speed;
+      p.x += p.drift;
+      if (p.y < -4) {
+        p.y = canvas.height + 4;
+        p.x = Math.random() * canvas.width;
+      }
+      if (p.x < -4 || p.x > canvas.width + 4) {
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  initParticles();
+  document.getElementById('btn-start').addEventListener('click', startTest);
+  document.getElementById('btn-retry').addEventListener('click', retry);
+});
+</script>
+</body>
+</html>

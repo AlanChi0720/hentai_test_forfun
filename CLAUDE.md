@@ -48,7 +48,7 @@ Each entry needs `label` (display text) and `gradient` (CSS `linear-gradient` st
 `index.html` is a three-screen SPA with no framework:
 
 - **Screens**: `#screen-intro`, `#screen-question`, `#screen-result`. Only one is visible at a time via CSS class `active`. `transitionTo(screenId)` handles the fade transition.
-- **State**: A plain `state` object `{ questions[], current, answers[] }`. Questions are Fisher-Yates shuffled on each run; 5 are picked (currently the full pool of 5).
+- **State**: A plain `state` object `{ questions[], current, answers[] }`. Questions are Fisher-Yates shuffled on each run; 5 are picked from the pool of 15.
 - **Result**: Always `変態です / HENTAIDESU` regardless of answers. The 4 fake MBTI dimension bars get randomized percentages (55–98%) each run; 2 comments are randomly picked from the `COMMENTS` pool.
 - **Particles**: A `<canvas>` RAF loop renders drifting pink/purple dots as the background. Entirely cosmetic.
 - **Fonts**: Noto Serif JP + Orbitron loaded from Google Fonts. Falls back to Yu Gothic / serif when offline.
